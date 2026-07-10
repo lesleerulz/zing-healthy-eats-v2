@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "@/components/CartProvider";
 import { motion } from "framer-motion";
 import { ArrowLeft, Lock, Loader2 } from "lucide-react";
@@ -7,12 +7,34 @@ import { ArrowLeft, Lock, Loader2 } from "lucide-react";
 export default function CheckoutPage() {
   const { cart, cartTotal, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "mpesa">("mpesa");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: ""
   });
+
+  // Pre-fill form with logged-in user's data
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status && data.data) {
+            setFormData(prev => ({
+              ...prev,
+              name: data.data.username || prev.name,
+              email: data.data.email || prev.email,
+              phone: data.data.savedPhone || prev.phone,
+            }));
+          }
+        }
+      } catch {
+        // Not logged in — they'll fill it manually
+      }
+    }
+    loadUser();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,7 +44,6 @@ export default function CheckoutPage() {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Build the items array from the cart for order creation
     const orderItems = cart.map(item => ({
       id: item.id,
       title: item.title,
@@ -35,29 +56,20 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: paymentMethod === "card" ? "initialize" : "charge_mobile_money",
           email: formData.email,
           phone: formData.phone,
           amount: cartTotal,
-          provider: "mpesa",
           items: orderItems,
         })
       });
 
       const data = await response.json();
 
-      if (data.status) {
-        if (paymentMethod === "card" && data.data.authorization_url) {
-          // Clear cart and redirect to Paystack secure checkout
-          clearCart();
-          window.location.href = data.data.authorization_url;
-        } else if (paymentMethod === "mpesa") {
-          // M-Pesa push sent to phone (or mock success)
-          clearCart();
-          window.location.href = `/orders?reference=${data.data.reference}`;
-        }
+      if (data.status && data.data.authorization_url) {
+        clearCart();
+        window.location.href = data.data.authorization_url;
       } else {
-        alert("Payment failed: " + data.message);
+        alert(data.message || "Payment failed");
         setIsProcessing(false);
       }
     } catch (error) {
@@ -102,30 +114,18 @@ export default function CheckoutPage() {
               <div>
                 <h2 className="text-sm uppercase tracking-widest text-[#7A614A] font-semibold mb-4">Contact Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input required type="text" name="name" placeholder="Full Name" onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816] placeholder-[#9A8A7A]" />
-                  <input required type="email" name="email" placeholder="Email Address" onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816] placeholder-[#9A8A7A]" />
-                  <input required type="tel" name="phone" placeholder="Phone (e.g. 0712345678)" onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816] placeholder-[#9A8A7A] md:col-span-2" />
+                  <input required type="text" name="name" value={formData.name} placeholder="Full Name" onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816] placeholder-[#9A8A7A]" />
+                  <input required type="email" name="email" value={formData.email} placeholder="Email Address" onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816] placeholder-[#9A8A7A]" />
+                  <input required type="tel" name="phone" value={formData.phone} placeholder="Phone (e.g. 0712345678)" onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816] placeholder-[#9A8A7A] md:col-span-2" />
                 </div>
               </div>
 
-              {/* Payment Method */}
-              <div>
-                <h2 className="text-sm uppercase tracking-widest text-[#7A614A] font-semibold mb-4">Payment Method</h2>
-                <div className="flex flex-col gap-4">
-                  <label className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'mpesa' ? 'border-[#1C1816] bg-[#EBE5D9]' : 'border-[#DCD4C4] hover:border-[#1C1816]'}`}>
-                    <div className="flex items-center gap-3">
-                      <input type="radio" name="payment" checked={paymentMethod === 'mpesa'} onChange={() => setPaymentMethod('mpesa')} className="accent-[#1C1816] w-4 h-4" />
-                      <span className="font-semibold text-[#1C1816]">M-Pesa (Mobile Money)</span>
-                    </div>
-                    <span className="text-xs font-semibold text-[#25D366] bg-[#25D366]/10 px-2 py-1 rounded">INSTANT</span>
-                  </label>
-                  
-                  <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-[#1C1816] bg-[#EBE5D9]' : 'border-[#DCD4C4] hover:border-[#1C1816]'}`}>
-                    <div className="flex items-center gap-3">
-                      <input type="radio" name="payment" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="accent-[#1C1816] w-4 h-4" />
-                      <span className="font-semibold text-[#1C1816]">Credit / Debit Card</span>
-                    </div>
-                  </label>
+              {/* Payment Info */}
+              <div className="flex items-start gap-3 p-4 bg-[#EBE5D9] border border-[#DCD4C4] rounded-xl">
+                <Lock className="w-5 h-5 text-[#7A614A] mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-[#1C1816]">Secure Payment via Paystack</p>
+                  <p className="text-xs text-[#7A614A] mt-1">You&apos;ll be redirected to Paystack to choose your payment method (M-Pesa or Card) and complete the transaction securely.</p>
                 </div>
               </div>
 
@@ -143,7 +143,7 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <Lock className="w-5 h-5" />
-                    Pay KES {cartTotal.toLocaleString()}
+                    Continue to Payment — KES {cartTotal.toLocaleString()}
                   </>
                 )}
               </button>

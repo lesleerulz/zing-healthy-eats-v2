@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || "";
 
-// Verify a transaction after redirect from Paystack
+// Verify a transaction after redirect from Paystack, and confirm the order in our DB.
+// This lets the post-payment page confirm locally without relying solely on the webhook.
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -25,6 +27,36 @@ export async function GET(req: Request) {
     );
 
     const data = await response.json();
+
+    if (data.status && data.data?.status === "success") {
+      const verifiedPhone =
+        data.data.authorization?.mobile_money_number ||
+        data.data.metadata?.phone ||
+        null;
+
+      const order = await prisma.order.findFirst({
+        where: { paystackReference: reference },
+      });
+
+      if (order && order.status !== "Confirmed" && order.status !== "Delivered") {
+        await prisma.order.update({
+          where: { id: order.id },
+          data: {
+            status: "Confirmed",
+            confirmedAt: new Date(),
+            phoneNumber: verifiedPhone || order.phoneNumber,
+          },
+        });
+
+        if (verifiedPhone && data.data.channel === "mobile_money") {
+          await prisma.user.update({
+            where: { id: order.userId },
+            data: { savedPhone: verifiedPhone },
+          });
+        }
+      }
+    }
+
     return NextResponse.json(data);
   } catch (error) {
     console.error("Verify error:", error);

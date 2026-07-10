@@ -1,97 +1,47 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductCard3D from "@/components/ProductCard3D";
 
-// Hardcoded for now, but we will fetch this from Prisma!
-const CATALOG_PRODUCTS = [
-  {
-    id: 1,
-    title: "Signature Honey Almond",
-    description: "Oats baked with pure wild honey, roasted almonds, and a hint of vanilla.",
-    price: "KES 1,200",
-    category: "Granola",
-    imageUrl: "/product1.jpg"
-  },
-  {
-    id: 2,
-    title: "Tropical Sunrise",
-    description: "A vibrant blend of dried mango, toasted coconut, macadamia nuts, and cashews.",
-    price: "KES 1,500",
-    category: "Trail Mix",
-    imageUrl: "/product2.jpg"
-  },
-  {
-    id: 3,
-    title: "Dark Choc Hazelnut",
-    description: "Roasted hazelnuts bound together with rich 70% dark chocolate and sea salt.",
-    price: "KES 1,800",
-    category: "Premium",
-    imageUrl: "/product3.jpg"
-  },
-  {
-    id: 4,
-    title: "Berry Antioxidant Blend",
-    description: "A tangy and sweet mix of goji berries, dried cranberries, walnuts, and pumpkin seeds.",
-    price: "KES 1,450",
-    category: "Trail Mix",
-    imageUrl: "/product4.jpg"
-  },
-  {
-    id: 5,
-    title: "Maple Pecan Crunch",
-    description: "Autumn flavors packed into crunchy oats with real maple syrup and toasted pecans.",
-    price: "KES 1,300",
-    category: "Granola",
-    imageUrl: "/product5.jpg"
-  },
-  {
-    id: 6,
-    title: "Spicy Sriracha Cashews",
-    description: "For the bold. Jumbo cashews roasted in our house-made honey sriracha glaze.",
-    price: "KES 1,600",
-    category: "Premium",
-    imageUrl: "/product6.jpg"
-  },
-  {
-    id: 7,
-    title: "Zesty Lemon & Poppy",
-    description: "Bright and refreshing granola baked with fresh lemon zest and poppy seeds.",
-    price: "KES 1,150",
-    category: "Granola",
-    imageUrl: "/product7.jpg"
-  },
-  {
-    id: 8,
-    title: "Savoury Rosemary Nuts",
-    description: "A refined mix of walnuts and almonds roasted with fresh rosemary and sea salt.",
-    price: "KES 1,700",
-    category: "Premium",
-    imageUrl: "/product8.jpg"
-  },
-  {
-    id: 9,
-    title: "Classic Power Mix",
-    description: "The essential trail mix with peanuts, raisins, sunflower seeds, and dark chocolate drops.",
-    price: "KES 950",
-    category: "Trail Mix",
-    imageUrl: "/product9.jpg"
-  }
-];
-
 const CATEGORIES = ["All", "Granola", "Trail Mix", "Premium"];
+
+type CatalogProduct = {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  image: string;
+  category: string;
+  isPeoplesChoice: boolean;
+};
 
 export default function CatalogPage() {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [filteredProducts, setFilteredProducts] = useState(CATALOG_PRODUCTS);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (activeCategory === "All") {
-      setFilteredProducts(CATALOG_PRODUCTS);
-    } else {
-      setFilteredProducts(CATALOG_PRODUCTS.filter(p => p.category === activeCategory));
+    async function load() {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+        if (data.status && Array.isArray(data.data)) {
+          setProducts(data.data);
+        }
+      } catch {
+        // ignore — empty catalog
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [activeCategory]);
+    load();
+  }, []);
+
+  const filteredProducts = useMemo(() => {
+    if (activeCategory === "All") return products;
+    return products.filter((p) => p.category === activeCategory);
+  }, [activeCategory, products]);
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] pt-32 pb-24">
@@ -147,10 +97,21 @@ export default function CatalogPage() {
                 transition={{ duration: 0.5, ease: "easeOut" }}
               >
                 <a href={`/product/${product.id}`}>
-                  <ProductCard3D {...product} />
+                  <ProductCard3D
+                    title={product.title}
+                    description={product.description}
+                    category={product.category}
+                    price={`KES ${product.price.toLocaleString()}`}
+                    imageUrl={product.image}
+                  />
                 </a>
               </motion.div>
             ))}
+            {!loading && filteredProducts.length === 0 && (
+              <p className="col-span-full text-center text-[#7A614A] py-12">
+                No products found in this category.
+              </p>
+            )}
           </AnimatePresence>
         </motion.div>
       </section>

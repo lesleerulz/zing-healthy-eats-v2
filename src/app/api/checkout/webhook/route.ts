@@ -26,7 +26,13 @@ export async function POST(req: Request) {
     if (event.event === "charge.success") {
       const data = event.data;
       const reference = data.reference;
-      const phone = data.metadata?.phone || null;
+
+      // Extract the phone number from the payment
+      // For M-Pesa: Paystack includes it in the authorization object
+      const verifiedPhone =
+        data.authorization?.mobile_money_number ||
+        data.metadata?.phone ||
+        null;
 
       // Find the order by paystack reference
       const order = await prisma.order.findFirst({
@@ -40,16 +46,16 @@ export async function POST(req: Request) {
           data: {
             status: "Confirmed",
             confirmedAt: new Date(),
-            phoneNumber: phone || order.phoneNumber,
+            phoneNumber: verifiedPhone || order.phoneNumber,
           },
         });
 
         // If M-Pesa payment succeeded, save the verified phone to the user
-        // (Your clever phone verification idea — a successful M-Pesa charge proves the number is real)
-        if (phone && data.channel === "mobile_money") {
+        // A successful M-Pesa charge proves the number is real and belongs to them
+        if (verifiedPhone && data.channel === "mobile_money") {
           await prisma.user.update({
             where: { id: order.userId },
-            data: { savedPhone: phone },
+            data: { savedPhone: verifiedPhone },
           });
         }
       }
