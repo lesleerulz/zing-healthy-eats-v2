@@ -1,0 +1,166 @@
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                           Int         @id @default(autoincrement())
+  username                     String      @unique
+  email                        String      @unique
+  address                      String?
+  profilePicture               String      @map("profile_picture") @default("default_profile.webp")
+  passwordHash                 String?     @map("password_hash")
+  isAdmin                      Boolean     @map("is_admin") @default(false)
+  isDriver                     Boolean     @map("is_driver") @default(false)
+  savedPhone                   String?     @map("saved_phone")
+  isVerified                   Boolean     @map("is_verified") @default(false)
+  verificationCode             String?     @map("verification_code")
+  verificationCodeExpiresAt    DateTime?   @map("verification_code_expires_at")
+  ordersAsBuyer                Order[]     @relation("BuyerOrders")
+  ordersAsDriver               Order[]     @relation("DriverOrders")
+  cartItems                    CartItem[]
+
+  @@map("user")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+
+  @@map("category")
+}
+
+model Product {
+  id                Int            @id @default(autoincrement())
+  dateAdded         DateTime       @map("date_added") @default(now())
+  title             String
+  description       String
+  image             String         @default("default_product.webp")
+  price             Float
+  originalPrice     Float?         @map("original_price")
+  quantity          Int            @default(0)
+  categoryId        Int?           @map("category_id")
+  category          Category?      @relation(fields: [categoryId], references: [id])
+  isPeoplesChoice   Boolean        @map("is_peoples_choice") @default(false)
+  isActive          Boolean        @map("is_active") @default(true)
+  images            ProductImage[]
+  cartItems         CartItem[]
+  orderItems        OrderItem[]
+
+  @@index([title])
+  @@map("product")
+}
+
+model ProductImage {
+  id            Int     @id @default(autoincrement())
+  productId     Int     @map("product_id")
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  imageFilename String  @map("image_filename")
+  isPrimary     Boolean @map("is_primary") @default(false)
+
+  @@map("product_image")
+}
+
+model Order {
+  id                   Int         @id @default(autoincrement())
+  userId               Int         @map("user_id")
+  user                 User        @relation("BuyerOrders", fields: [userId], references: [id])
+  createdAt            DateTime    @map("created_at") @default(now())
+  phoneNumber          String?     @map("phone_number")
+  mpesaReceiptNumber   String?     @map("mpesa_receipt_number")
+  checkoutRequestId    String?     @map("checkout_request_id")
+  paystackReference    String?     @map("paystack_reference")
+  status               String      @default("Pending")
+  driverId             Int?        @map("driver_id")
+  driver               User?       @relation("DriverOrders", fields: [driverId], references: [id])
+  deliveryLat          Float?      @map("delivery_lat")
+  deliveryLng          Float?      @map("delivery_lng")
+  deliveryType         String      @map("delivery_type") @default("delivery")
+  deliveryAddress      String?     @map("delivery_address")
+  deliveryFee          Float       @map("delivery_fee") @default(0.0)
+  notes                String?
+  confirmedAt          DateTime?   @map("confirmed_at")
+  deliveredAt          DateTime?   @map("delivered_at")
+  items                OrderItem[]
+
+  @@map("order")
+}
+
+model OrderItem {
+  id           Int      @id @default(autoincrement())
+  orderId      Int      @map("order_id")
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId    Int?     @map("product_id")
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  quantity     Int
+  productTitle String   @map("product_title")
+  productPrice Float    @map("product_price")
+
+  @@map("order_item")
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  userId    Int     @map("user_id")
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId Int     @map("product_id")
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int     @default(1)
+
+  @@map("cart_item")
+}
+
+model CarouselImage {
+  id            Int      @id @default(autoincrement())
+  imageFilename String   @map("image_filename")
+  createdAt     DateTime @map("created_at") @default(now())
+
+  @@map("carousel_image")
+}
+
+model FAQ {
+  id       Int    @id @default(autoincrement())
+  question String
+  answer   String
+
+  @@map("faq")
+}
+
+model AboutContent {
+  id      Int    @id @default(autoincrement())
+  section String @unique
+  content String
+
+  @@map("about_content")
+}
+
+model SocialLink {
+  id        Int    @id @default(autoincrement())
+  platform  String
+  url       String
+  iconClass String
+
+  @@map("social_link")
+}
+
+model TeamMember {
+  id            Int    @id @default(autoincrement())
+  name          String
+  role          String
+  imageFilename String @map("image_filename")
+
+  @@map("team_member")
+}
+
+model SiteSetting {
+  id    Int     @id @default(autoincrement())
+  key   String  @unique
+  value String?
+
+  @@map("site_setting")
+}
