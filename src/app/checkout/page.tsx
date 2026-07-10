@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Lock, Loader2 } from "lucide-react";
 
 export default function CheckoutPage() {
-  const { cart, cartTotal } = useCart();
+  const { cart, cartTotal, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "mpesa">("mpesa");
   const [formData, setFormData] = useState({
@@ -22,6 +22,14 @@ export default function CheckoutPage() {
     e.preventDefault();
     setIsProcessing(true);
 
+    // Build the items array from the cart for order creation
+    const orderItems = cart.map(item => ({
+      id: item.id,
+      title: item.title,
+      price: parseFloat(item.price.replace(/KES |,|_/g, '')),
+      quantity: item.quantity,
+    }));
+
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -32,7 +40,7 @@ export default function CheckoutPage() {
           phone: formData.phone,
           amount: cartTotal,
           provider: "mpesa",
-          reference: `ZING-${Date.now()}` // Generate a unique order ref
+          items: orderItems,
         })
       });
 
@@ -40,12 +48,13 @@ export default function CheckoutPage() {
 
       if (data.status) {
         if (paymentMethod === "card" && data.data.authorization_url) {
-          // Redirect to Paystack secure checkout
+          // Clear cart and redirect to Paystack secure checkout
+          clearCart();
           window.location.href = data.data.authorization_url;
         } else if (paymentMethod === "mpesa") {
-          // M-Pesa push sent to phone
-          alert(data.data.display_text || "Check your phone for the M-Pesa prompt!");
-          setIsProcessing(false);
+          // M-Pesa push sent to phone (or mock success)
+          clearCart();
+          window.location.href = `/orders?reference=${data.data.reference}`;
         }
       } else {
         alert("Payment failed: " + data.message);

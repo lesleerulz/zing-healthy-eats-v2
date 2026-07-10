@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { OAuth2Client } from "google-auth-library";
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 
-const client = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 const JWT_SECRET = process.env.JWT_SECRET || process.env.SECRET_KEY || "fallback-secret-for-dev";
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 export async function POST(req: Request) {
   try {
@@ -17,20 +16,36 @@ export async function POST(req: Request) {
       );
     }
 
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-    });
+    // Verify the Google ID token via Google's tokeninfo endpoint
+    const googleRes = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${token}`
+    );
 
-    const payload = ticket.getPayload();
-    if (!payload || !payload.email) {
+    if (!googleRes.ok) {
       return NextResponse.json(
         { status: false, message: "Invalid Google token" },
-        { status: 400 }
+        { status: 401 }
+      );
+    }
+
+    const payload = await googleRes.json();
+
+    // Verify the token was issued for our app
+    if (payload.aud !== GOOGLE_CLIENT_ID) {
+      return NextResponse.json(
+        { status: false, message: "Token was not issued for this application" },
+        { status: 401 }
       );
     }
 
     const { email, name } = payload;
+
+    if (!email) {
+      return NextResponse.json(
+        { status: false, message: "No email in Google token" },
+        { status: 400 }
+      );
+    }
 
     // Check if user exists
     let user = await prisma.user.findUnique({
@@ -38,13 +53,19 @@ export async function POST(req: Request) {
     });
 
     if (!user) {
-      // Create user
+      // Create user — Google has already verified their email
       user = await prisma.user.create({
         data: {
           email,
           username: name || email.split("@")[0],
-          // Google users might not have a password hash. Make sure your schema allows this or just provide a dummy string
+          isVerified: true,
         },
+      });
+    } else if (!user.isVerified) {
+      // Existing user signing in via Google — mark as verified
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { isVerified: true },
       });
     }
 
@@ -83,3 +104,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

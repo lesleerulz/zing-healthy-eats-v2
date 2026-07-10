@@ -16,6 +16,7 @@ type CartContextType = {
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
+  clearCart: () => void;
   toggleCart: () => void;
   cartTotal: number;
 };
@@ -76,12 +77,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("zing-cart");
+  };
+
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
 
   return (
-    <CartContext.Provider value={{ cart, isCartOpen, addToCart, removeFromCart, updateQuantity, toggleCart, cartTotal }}>
+    <CartContext.Provider value={{ cart, isCartOpen, addToCart, removeFromCart, updateQuantity, clearCart, toggleCart, cartTotal }}>
       {children}
     </CartContext.Provider>
   );
