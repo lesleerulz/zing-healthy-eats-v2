@@ -77,7 +77,7 @@ function OrdersConfirmPage() {
     async function verifyOnce() {
       try {
         const res = await fetch(
-          `/api/checkout/verify?reference=${encodeURIComponent(reference)}`,
+          `/api/checkout/verify?reference=${encodeURIComponent(reference || "")}`,
           { method: "GET", cache: "no-store" }
         );
         const data = await res.json();
@@ -95,7 +95,7 @@ function OrdersConfirmPage() {
     async function load() {
       try {
         const res = await fetch(
-          `/api/checkout/status?reference=${encodeURIComponent(reference)}`
+          `/api/checkout/status?reference=${encodeURIComponent(reference || "")}`
         );
         const data = await res.json();
         if (cancelled) return;
@@ -175,7 +175,7 @@ function OrdersConfirmPage() {
               </div>
             )}
 
-            {order?.items?.length > 0 && (
+            {order?.items && order.items.length > 0 && (
               <div className="space-y-3 mb-6">
                 {order.items.map((item: OrderItem, i: number) => (
                   <div key={i} className="flex justify-between text-sm border-b border-[#EBE5D9] pb-3">
