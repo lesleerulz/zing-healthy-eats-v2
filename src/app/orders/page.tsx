@@ -13,6 +13,7 @@ type Status =
   | "confirmed"
   | "pending"
   | "failed"
+  | "history"
   | "notfound"
   | "error";
 
@@ -35,14 +36,37 @@ function OrdersConfirmPage() {
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
 
-  const [status, setStatus] = useState<Status>(reference ? "loading" : "notfound");
+  const [status, setStatus] = useState<Status>(reference ? "loading" : "history");
   const [failType, setFailType] = useState<"timeout" | "declined" | null>(null);
   const [order, setOrder] = useState<OrderData | null>(null);
+  const [history, setHistory] = useState<OrderData[] | null>(null);
   const [attempt, setAttempt] = useState(0); // bump to retry
 
   useEffect(() => {
+    // No reference => show the user's order history list.
     if (!reference) {
-      return;
+      let cancelled = false;
+      (async () => {
+        try {
+          const res = await fetch("/api/orders");
+          const data = await res.json();
+          if (!cancelled && data.status && Array.isArray(data.data)) {
+            setHistory(data.data);
+            setStatus("history");
+          } else if (!cancelled) {
+            setHistory([]);
+            setStatus("history");
+          }
+        } catch {
+          if (!cancelled) {
+            setHistory([]);
+            setStatus("history");
+          }
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
     }
 
     let cancelled = false;
@@ -221,6 +245,76 @@ function OrdersConfirmPage() {
             <p className="text-xs text-[#9A8A7A] mt-6">
               If you were charged but this still shows, please contact support with your reference.
             </p>
+          </motion.div>
+        )}
+
+        {status === "history" && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-3xl border border-[#EBE5D9] p-8 md:p-12"
+          >
+            <h1 className="font-[family-name:var(--font-playfair)] text-3xl text-[#1C1816] mb-2">
+              Order History
+            </h1>
+            <p className="text-[#7A614A] mb-6">
+              {history && history.length > 0
+                ? "Here are your recent orders."
+                : "You haven't placed any orders yet."}
+            </p>
+
+            <div className="space-y-4">
+              {history?.map((o) => {
+                const total = (o.items ?? []).reduce(
+                  (sum: number, it) => sum + it.productPrice * it.quantity,
+                  0
+                );
+                return (
+                  <div
+                    key={o.reference}
+                    className="border border-[#EBE5D9] rounded-2xl p-5"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-[#1C1816] break-all">
+                        {o.reference}
+                      </span>
+                      <span
+                        className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                          o.status === "Confirmed" || o.status === "Delivered"
+                            ? "bg-green-500/10 text-green-600"
+                            : "bg-amber-500/10 text-amber-600"
+                        }`}
+                      >
+                        {o.status}
+                      </span>
+                    </div>
+                    {(o.items ?? []).map((it, i) => (
+                      <div key={i} className="flex justify-between text-sm text-[#5C4D3C] py-1">
+                        <span>
+                          {it.productTitle} <span className="text-[#9A8A7A]">× {it.quantity}</span>
+                        </span>
+                        <span className="font-medium">
+                          KES {(it.productPrice * it.quantity).toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                    <div className="flex justify-between border-t border-[#EBE5D9] mt-2 pt-2 text-sm font-bold text-[#1C1816]">
+                      <span>Total</span>
+                      <span>KES {total.toLocaleString()}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-6">
+              <Link
+                href="/catalog"
+                className="block text-center px-6 py-3 bg-[#1C1816] text-[#FAF8F5] rounded-full font-semibold hover:bg-[#3A322C] transition-colors"
+              >
+                Back to Pantry
+              </Link>
+            </div>
           </motion.div>
         )}
 

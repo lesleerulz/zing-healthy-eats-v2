@@ -169,6 +169,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [orderCount, setOrderCount] = useState(0);
 
   // Tab state (desktop)
   const [activeTab, setActiveTab] = useState<
@@ -236,7 +237,21 @@ export default function ProfilePage() {
         setLoading(false);
       }
     }
+
+    async function fetchOrderCount() {
+      try {
+        const res = await fetch("/api/orders");
+        const data = await res.json();
+        if (data.status && Array.isArray(data.data)) {
+          setOrderCount(data.data.length);
+        }
+      } catch {
+        // ignore — keep 0
+      }
+    }
+
     fetchUser();
+    fetchOrderCount();
   }, [router]);
 
   // ─── Profile update handler ────────────────────────────────────────────────
@@ -751,7 +766,7 @@ export default function ProfilePage() {
               <p className="text-xs font-semibold uppercase tracking-wider text-[#9A8A7A]">
                 Orders Placed
               </p>
-              <p className="text-sm font-bold text-[#1C1816]">0</p>
+              <p className="text-sm font-bold text-[#1C1816]">{orderCount}</p>
             </div>
           </div>
 
