@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { PackagePlus, Save, ArrowLeft, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
 
+import { createProduct } from "../actions";
+
 export default async function NewProductPage() {
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' }
@@ -22,7 +24,7 @@ export default async function NewProductPage() {
         </div>
       </div>
 
-      <form className="space-y-6">
+      <form action={createProduct} className="space-y-6">
         <div className="bg-[#1A1A23] rounded-xl border border-white/5 overflow-hidden">
           <div className="p-6 space-y-6">
             {/* Basic Info */}
@@ -33,6 +35,7 @@ export default async function NewProductPage() {
                 <label className="text-sm font-medium text-gray-300">Product Title</label>
                 <input 
                   type="text" 
+                  name="title"
                   placeholder="e.g., Grilled Chicken Salad"
                   className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4A373] transition-colors"
                   required
@@ -42,6 +45,7 @@ export default async function NewProductPage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-300">Description</label>
                 <textarea 
+                  name="description"
                   rows={4}
                   placeholder="Describe the product..."
                   className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4A373] transition-colors resize-none"
@@ -59,6 +63,7 @@ export default async function NewProductPage() {
                   <label className="text-sm font-medium text-gray-300">Price ($)</label>
                   <input 
                     type="number" 
+                    name="price"
                     step="0.01"
                     placeholder="0.00"
                     className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4A373] transition-colors"
@@ -66,18 +71,10 @@ export default async function NewProductPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Original Price ($) <span className="text-gray-500 font-normal">(Optional)</span></label>
-                  <input 
-                    type="number" 
-                    step="0.01"
-                    placeholder="0.00"
-                    className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4A373] transition-colors"
-                  />
-                </div>
-                <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-300">Stock Quantity</label>
                   <input 
                     type="number" 
+                    name="quantity"
                     defaultValue="0"
                     className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4A373] transition-colors"
                     required
@@ -94,6 +91,7 @@ export default async function NewProductPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-300">Category</label>
                   <select 
+                    name="categoryId"
                     className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#D4A373] transition-colors appearance-none"
                     required
                     defaultValue=""
@@ -107,11 +105,12 @@ export default async function NewProductPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-300">Status</label>
                   <select 
+                    name="isActive"
                     className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#D4A373] transition-colors appearance-none"
-                    defaultValue="true"
+                    defaultValue="on"
                   >
-                    <option value="true">Active (Visible)</option>
-                    <option value="false">Inactive (Hidden)</option>
+                    <option value="on">Active (Visible)</option>
+                    <option value="off">Inactive (Hidden)</option>
                   </select>
                 </div>
               </div>
@@ -120,10 +119,15 @@ export default async function NewProductPage() {
             {/* Image Upload Placeholder */}
             <div className="space-y-4 pt-4 border-t border-white/5">
               <h2 className="text-lg font-semibold text-white">Product Image</h2>
-              <div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center hover:bg-white/5 hover:border-white/20 transition-colors cursor-pointer">
-                <ImageIcon className="h-10 w-10 text-gray-500 mx-auto mb-3" />
-                <p className="text-sm text-gray-300 font-medium">Click to upload or drag and drop</p>
-                <p className="text-xs text-gray-500 mt-1">SVG, PNG, JPG or WEBP (max. 5MB)</p>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-300">Image URL</label>
+                <input 
+                  type="text" 
+                  name="image"
+                  placeholder="https://example.com/image.jpg or /images/product.jpg"
+                  className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4A373] transition-colors"
+                  required
+                />
               </div>
             </div>
           </div>
@@ -136,7 +140,7 @@ export default async function NewProductPage() {
               Cancel
             </Link>
             <button 
-              type="button"
+              type="submit"
               className="bg-[#D4A373] text-black hover:bg-[#D4A373]/90 px-6 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-colors"
             >
               <Save className="h-4 w-4" />

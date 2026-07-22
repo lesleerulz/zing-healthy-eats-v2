@@ -35,6 +35,7 @@ export default async function AdminProductsPage() {
                 <th className="px-6 py-3 font-medium">Price</th>
                 <th className="px-6 py-3 font-medium">Stock</th>
                 <th className="px-6 py-3 font-medium">Status</th>
+                <th className="px-6 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#2A2A35]">
@@ -69,11 +70,33 @@ export default async function AdminProductsPage() {
                       {product.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                    <div className="flex items-center justify-end gap-3">
+                      <Link 
+                        href={`/admin/products/${product.id}/edit`}
+                        className="text-[#9CA3AF] hover:text-[#F5F5F5] transition-colors" 
+                        title="Edit"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+                      </Link>
+                      <form action={async () => {
+                        "use server";
+                        await prisma.product.delete({ where: { id: product.id } });
+                        const { revalidatePath } = await import("next/cache");
+                        revalidatePath("/admin/products");
+                        revalidatePath("/catalog");
+                      }}>
+                        <button type="submit" className="text-[#9CA3AF] hover:text-red-400 transition-colors" title="Delete">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
                 </tr>
               ))}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-[#9CA3AF]">
+                  <td colSpan={7} className="px-6 py-8 text-center text-[#9CA3AF]">
                     No products found.
                   </td>
                 </tr>
