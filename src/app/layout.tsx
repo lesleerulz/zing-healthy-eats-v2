@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Zing Healthy Eats | Artisanal Granola",
+  title: "Zing Healthy Treats | Artisanal Granola",
   description: "Premium breakfast nuts, granola, and trail mixes.",
 };
 

@@ -50,7 +50,7 @@ export default function Navbar() {
     >
       <div className="flex items-center gap-2 cursor-pointer">
         <a href="/" className="font-[family-name:var(--font-playfair)] font-bold text-2xl text-[#1C1816] tracking-tighter hover:opacity-80 transition-opacity">
-          Zing Healthy Eats<span className="text-[#D4A373]">.</span>
+          Zing Healthy Treats<span className="text-[#D4A373]">.</span>
         </a>
       </div>
 

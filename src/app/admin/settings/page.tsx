@@ -29,7 +29,7 @@ export default function SettingsPage() {
                 <label className="text-sm font-medium text-gray-300">Store Name</label>
                 <input 
                   type="text" 
-                  defaultValue="Zing Healthy Eats"
+                  defaultValue="Zing Healthy Treats"
                   className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#D4A373] transition-colors"
                 />
               </div>

@@ -58,7 +58,7 @@ export default function AuthPage() {
         {/* Left Column - Imagery (Hidden on mobile) */}
       <div className="hidden lg:flex w-1/2 bg-[#EBE5D9] relative overflow-hidden flex-col justify-between p-12">
         <a href="/" className="z-20 font-[family-name:var(--font-playfair)] font-bold text-2xl text-[#1C1816] tracking-tighter hover:opacity-80 transition-opacity w-fit">
-          Zing Healthy Eats<span className="text-[#D4A373]">.</span>
+          Zing Healthy Treats<span className="text-[#D4A373]">.</span>
         </a>
 
         <div className="z-20 max-w-md">
