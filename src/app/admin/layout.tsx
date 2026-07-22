@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback-secret-for-dev") as { isAdmin?: boolean, userId?: number };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.SECRET_KEY || "fallback-secret-for-dev") as { isAdmin?: boolean, userId?: number };
     if (!decoded.isAdmin) {
       redirect("/profile");
     }
