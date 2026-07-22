@@ -65,6 +65,16 @@ export async function POST(req: Request) {
             data: { savedPhone: verifiedPhone },
           });
         }
+
+        // Deduct stock
+        for (const item of order.items) {
+          if (item.productId) {
+            await prisma.product.update({
+              where: { id: item.productId },
+              data: { quantity: { decrement: item.quantity } },
+            });
+          }
+        }
       }
     }
 

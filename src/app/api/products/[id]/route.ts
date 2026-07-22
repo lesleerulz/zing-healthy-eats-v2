@@ -39,6 +39,7 @@ export async function GET(
         price: product.price,
         image: product.image,
         category: product.category?.name ?? "Uncategorized",
+        quantity: product.quantity,
       },
     });
   } catch (error) {

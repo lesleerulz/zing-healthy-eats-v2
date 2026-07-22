@@ -14,7 +14,11 @@ const CALLBACK_URL =
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, amount, phone, items, deliveryAddress, deliveryType, notes } = body;
+    const { email, phone, items, deliveryAddress, deliveryType, notes } = body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ status: false, message: "Cart is empty" }, { status: 400 });
+    }
 
     // Get the logged-in user
     let userId: number | null = null;
@@ -36,6 +40,34 @@ export async function POST(req: Request) {
       );
     }
 
+    // ─── Security Check: Recalculate price from DB and check stock ────────
+    let calculatedTotal = 0;
+    const orderItemsToCreate = [];
+
+    for (const item of items) {
+      const dbProduct = await prisma.product.findUnique({ where: { id: item.id } });
+      
+      if (!dbProduct || !dbProduct.isActive) {
+        return NextResponse.json({ status: false, message: `Product ${item.title || item.id} is unavailable` }, { status: 400 });
+      }
+      
+      if (dbProduct.quantity < item.quantity) {
+        return NextResponse.json({ status: false, message: `Not enough stock for ${dbProduct.title}` }, { status: 400 });
+      }
+
+      calculatedTotal += dbProduct.price * item.quantity;
+      
+      orderItemsToCreate.push({
+        productId: dbProduct.id,
+        productTitle: dbProduct.title,
+        productPrice: dbProduct.price,
+        quantity: item.quantity,
+      });
+    }
+
+    const deliveryFee = 0; // Or calculate based on deliveryType if needed in future
+    const finalAmount = calculatedTotal + deliveryFee;
+
     // Generate a unique reference
     const reference = `ZING-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
@@ -47,15 +79,11 @@ export async function POST(req: Request) {
         phoneNumber: phone || null,
         deliveryAddress: deliveryAddress || null,
         deliveryType: deliveryType || "delivery",
+        deliveryFee: deliveryFee,
         notes: notes || null,
         status: "Pending",
         items: {
-          create: items.map((item: { id: number; title: string; price: number; quantity: number }) => ({
-            productId: item.id,
-            productTitle: item.title,
-            productPrice: item.price,
-            quantity: item.quantity,
-          })),
+          create: orderItemsToCreate,
         },
       },
     });
@@ -80,6 +108,16 @@ export async function POST(req: Request) {
         await sendInvoiceEmail(confirmedOrder.user.email, confirmedOrder, confirmedOrder.items);
       }
 
+      // Deduct stock
+      for (const item of confirmedOrder.items) {
+        if (item.productId) {
+          await prisma.product.update({
+            where: { id: item.productId },
+            data: { quantity: { decrement: item.quantity } },
+          });
+        }
+      }
+
       return NextResponse.json({
         status: true,
         message: "Transaction initialized (MOCK)",
@@ -102,7 +140,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           email,
-          amount: Math.round(amount * 100), // Paystack expects lowest currency unit
+          amount: Math.round(finalAmount * 100), // Paystack expects lowest currency unit
           currency: "KES",
           callback_url: CALLBACK_URL,
           reference,

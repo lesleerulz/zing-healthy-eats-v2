@@ -21,6 +21,7 @@ type Product = {
   price: number;
   image: string;
   category: string;
+  quantity: number;
 };
 
 export default function ProductDetailsPage() {
@@ -164,31 +165,41 @@ export default function ProductDetailsPage() {
 
               {/* Add to Cart Controls */}
               <div className="flex flex-col sm:flex-row gap-4 mb-16">
-                <div className="flex items-center border border-[#DCD4C4] rounded-full px-4 py-2 w-fit">
+                <div className="flex items-center border border-[#DCD4C4] rounded-full px-4 py-2 w-fit opacity-90">
                   <button
+                    disabled={product.quantity === 0}
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="text-[#7A614A] hover:text-[#1C1816] p-2 transition-colors"
+                    className="text-[#7A614A] hover:text-[#1C1816] p-2 transition-colors disabled:opacity-50"
                   >
                     -
                   </button>
-                  <span className="w-12 text-center text-[#1C1816] font-medium">{quantity}</span>
+                  <span className="w-12 text-center text-[#1C1816] font-medium">{product.quantity === 0 ? 0 : quantity}</span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="text-[#7A614A] hover:text-[#1C1816] p-2 transition-colors"
+                    disabled={product.quantity === 0 || quantity >= product.quantity}
+                    onClick={() => setQuantity(Math.min(quantity + 1, product.quantity))}
+                    className="text-[#7A614A] hover:text-[#1C1816] p-2 transition-colors disabled:opacity-50"
                   >
                     +
                   </button>
                 </div>
 
                 <button
+                  disabled={product.quantity === 0}
                   onClick={handleAddToCart}
                   className={`flex-1 flex items-center justify-center gap-2 py-4 px-8 rounded-full font-semibold tracking-wide transition-all duration-300 ${
-                    isAdded
+                    product.quantity === 0 
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : isAdded
                       ? "bg-emerald-600 text-white"
                       : "bg-[#1C1816] text-[#FAF8F5] hover:bg-[#3A322C]"
                   }`}
                 >
-                  {isAdded ? (
+                  {product.quantity === 0 ? (
+                    <>
+                      <ShoppingBag className="w-5 h-5" />
+                      Out of Stock
+                    </>
+                  ) : isAdded ? (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
