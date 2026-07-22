@@ -16,7 +16,7 @@ export async function sendInvoiceEmail(userEmail: string, order: any, items: any
     return;
   }
 
-  const totalAmount = items.reduce((sum, item) => sum + (item.productPrice * item.quantity), 0);
+  const totalAmount = items.reduce((sum: number, item: any) => sum + (item.productPrice * item.quantity), 0);
   const totalWithFee = totalAmount + (order.deliveryFee || 0);
 
   const htmlContent = `
@@ -35,7 +35,7 @@ export async function sendInvoiceEmail(userEmail: string, order: any, items: any
           </tr>
         </thead>
         <tbody>
-          ${items.map(item => `
+          ${items.map((item: any) => `
             <tr style="border-bottom: 1px solid #eee;">
               <td style="padding: 8px 0;">${item.productTitle}</td>
               <td style="padding: 8px 0;">${item.quantity}</td>
@@ -66,12 +66,12 @@ export async function sendInvoiceEmail(userEmail: string, order: any, items: any
 
   try {
     await transporter.sendMail({
-      from: \`"Zing Healthy Treats" <\${process.env.MAIL_USERNAME}>\`,
+      from: `"Zing Healthy Treats" <${process.env.MAIL_USERNAME}>`,
       to: userEmail,
-      subject: \`Your Invoice from Zing Healthy Treats (Order #\${order.paystackReference || order.id})\`,
+      subject: `Your Invoice from Zing Healthy Treats (Order #${order.paystackReference || order.id})`,
       html: htmlContent,
     });
-    console.log(\`Invoice email sent to \${userEmail}\`);
+    console.log(`Invoice email sent to ${userEmail}`);
   } catch (error) {
     console.error("Failed to send invoice email:", error);
   }
