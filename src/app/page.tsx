@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 import ProductCard3D from "@/components/ProductCard3D";
 
 const FEATURED_PRODUCTS = [
@@ -212,9 +213,9 @@ export default function Home() {
 
           <div className="flex flex-col md:flex-row justify-between items-end mb-20 border-b-2 border-dashed border-[#DCD4C4] pb-8 relative z-20">
             <h2 className="font-[family-name:var(--font-playfair)] text-5xl md:text-6xl text-[#1C1816]">The Harvest</h2>
-            <button className="uppercase tracking-widest text-xs font-semibold text-[#7A614A] hover:text-[#1C1816] transition-colors mt-6 md:mt-0">
+            <Link href="/catalog" className="uppercase tracking-widest text-xs font-semibold text-[#7A614A] hover:text-[#1C1816] transition-colors mt-6 md:mt-0">
               View Entire Pantry &rarr;
-            </button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-8">
