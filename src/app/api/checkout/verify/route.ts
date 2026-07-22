@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendInvoiceEmail } from "@/lib/mail";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || "";
 
@@ -36,6 +37,7 @@ export async function GET(req: Request) {
 
       const order = await prisma.order.findFirst({
         where: { paystackReference: reference },
+        include: { items: true, user: true }
       });
 
       if (order && order.status !== "Confirmed" && order.status !== "Delivered") {
@@ -47,6 +49,11 @@ export async function GET(req: Request) {
             phoneNumber: verifiedPhone || order.phoneNumber,
           },
         });
+
+        // Send Invoice Email
+        if (order.user?.email) {
+          await sendInvoiceEmail(order.user.email, order, order.items);
+        }
 
         if (verifiedPhone && data.data.channel === "mobile_money") {
           await prisma.user.update({

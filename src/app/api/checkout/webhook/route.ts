@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import crypto from "crypto";
+import { sendInvoiceEmail } from "@/lib/mail";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || "";
 
@@ -37,9 +38,10 @@ export async function POST(req: Request) {
       // Find the order by paystack reference
       const order = await prisma.order.findFirst({
         where: { paystackReference: reference },
+        include: { items: true, user: true }
       });
 
-      if (order) {
+      if (order && order.status !== "Confirmed" && order.status !== "Delivered") {
         // Update order status to Confirmed
         await prisma.order.update({
           where: { id: order.id },
@@ -49,6 +51,11 @@ export async function POST(req: Request) {
             phoneNumber: verifiedPhone || order.phoneNumber,
           },
         });
+
+        // Send Invoice Email
+        if (order.user?.email) {
+          await sendInvoiceEmail(order.user.email, order, order.items);
+        }
 
         // If M-Pesa payment succeeded, save the verified phone to the user
         // A successful M-Pesa charge proves the number is real and belongs to them
