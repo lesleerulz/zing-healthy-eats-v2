@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import prisma from "@/lib/prisma";
+import { sendInvoiceEmail } from "@/lib/mail";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || "";
 const PAYSTACK_MOCK = process.env.PAYSTACK_MOCK === "True";
@@ -61,9 +62,10 @@ export async function POST(req: Request) {
 
     // ─── Mock Mode ───────────────────────────────────────────────────────
     if (PAYSTACK_MOCK) {
-      await prisma.order.update({
+      const confirmedOrder = await prisma.order.update({
         where: { id: order.id },
         data: { status: "Confirmed", confirmedAt: new Date() },
+        include: { items: true, user: true }
       });
 
       if (phone && userId) {
@@ -71,6 +73,11 @@ export async function POST(req: Request) {
           where: { id: userId },
           data: { savedPhone: phone },
         });
+      }
+
+      // Send mock invoice email
+      if (confirmedOrder.user?.email) {
+        await sendInvoiceEmail(confirmedOrder.user.email, confirmedOrder, confirmedOrder.items);
       }
 
       return NextResponse.json({
