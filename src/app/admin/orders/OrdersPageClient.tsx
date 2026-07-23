@@ -50,8 +50,8 @@ export default function OrdersPageClient({ initialOrders }: { initialOrders: Ord
             </thead>
             <tbody className="divide-y divide-[#2A2A35]">
               {filteredOrders.map((order) => {
-                const total = order.items.reduce((sum, item) => sum + (item.quantity * item.productPrice), 0) + order.deliveryFee;
-                const itemsCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
+                const total = order.items.reduce((sum: number, item: any) => sum + (item.quantity * item.price), 0);
+                const itemsCount = order.items.reduce((sum: number, item: any) => sum + item.quantity, 0);
 
                 return (
                   <tr key={order.id} className="hover:bg-[#2A2A35]/50 transition-colors">
