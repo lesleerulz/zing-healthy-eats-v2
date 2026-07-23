@@ -9,7 +9,7 @@ interface FeaturedProduct {
   id: number;
   title: string;
   description: string;
-  price: string | number;
+  price: string;
   category: string;
   imageUrl: string;
 }
