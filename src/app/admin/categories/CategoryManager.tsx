@@ -7,7 +7,6 @@ import { createCategory, updateCategory, deleteCategory } from "./actions";
 type Category = {
   id: number;
   name: string;
-  description: string | null;
   _count: { products: number };
 };
 
@@ -125,15 +124,7 @@ export default function CategoryManager({ categories }: { categories: Category[]
                   className="w-full bg-[#0F0F12] border border-[#2A2A35] rounded-lg px-4 py-2 text-[#F5F5F5] focus:outline-none focus:border-[#D4A373] transition-colors"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9CA3AF]">Description</label>
-                <textarea 
-                  name="description" 
-                  defaultValue={editingCategory?.description || ""}
-                  rows={3}
-                  className="w-full bg-[#0F0F12] border border-[#2A2A35] rounded-lg px-4 py-2 text-[#F5F5F5] focus:outline-none focus:border-[#D4A373] transition-colors resize-none"
-                ></textarea>
-              </div>
+
               <div className="pt-4 flex justify-end gap-3">
                 <button 
                   type="button" 

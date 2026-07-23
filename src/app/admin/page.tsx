@@ -13,11 +13,11 @@ export default async function AdminDashboard() {
       orderBy: { createdAt: "desc" },
       include: { user: true, items: true },
     }),
-    prisma.$queryRaw<[{ total: number }]>`SELECT COALESCE(SUM(quantity * product_price), 0) AS total FROM order_item`,
-    prisma.$queryRaw<[{ total: number }]>`SELECT COALESCE(SUM(delivery_fee), 0) AS total FROM "order"`,
+    prisma.$queryRaw<[{ total: number }]>`SELECT CAST(COALESCE(SUM(quantity * product_price), 0) AS FLOAT8) AS total FROM order_item`,
+    prisma.$queryRaw<[{ total: number }]>`SELECT CAST(COALESCE(SUM(delivery_fee), 0) AS FLOAT8) AS total FROM "order"`,
   ]);
 
-  const totalRevenue = Number(itemsRevenue[0].total) + Number(deliveryRevenue[0].total);
+  const totalRevenue = (itemsRevenue[0]?.total ?? 0) + (deliveryRevenue[0]?.total ?? 0);
 
   const stats = [
     { name: "Total Revenue", value: `KES ${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-[#D4A373]" },

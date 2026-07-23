@@ -23,8 +23,23 @@ model User {
   ordersAsBuyer                Order[]     @relation("BuyerOrders")
   ordersAsDriver               Order[]     @relation("DriverOrders")
   cartItems                    CartItem[]
+  subscriptions                Subscription[]
 
   @@map("user")
+}
+
+model Subscription {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @map("user_id")
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planCode         String    @map("plan_code") // e.g. 'PLN_xxxx'
+  paystackSubCode  String?   @map("paystack_sub_code") // e.g. 'SUB_xxxx'
+  status           String    @default("Active") // 'Active', 'Cancelled', 'Failed'
+  createdAt        DateTime  @map("created_at") @default(now())
+  nextDeliveryDate DateTime? @map("next_delivery_date")
+  amount           Float
+
+  @@map("subscription")
 }
 
 model Category {

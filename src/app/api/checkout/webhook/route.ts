@@ -41,6 +41,7 @@ export async function POST(req: Request) {
         include: { items: true, user: true }
       });
 
+      // 1. IS THIS A NORMAL ORDER?
       if (order && order.status !== "Confirmed" && order.status !== "Delivered") {
         // Update order status to Confirmed
         await prisma.order.update({
@@ -73,6 +74,61 @@ export async function POST(req: Request) {
               where: { id: item.productId },
               data: { quantity: { decrement: item.quantity } },
             });
+          }
+        }
+      } 
+      
+      // 2. IS THIS A SUBSCRIPTION CHARGE?
+      else if (data.plan) {
+        // Find existing subscription by email to connect
+        const user = await prisma.user.findUnique({ where: { email: data.customer.email } });
+        if (user) {
+          // Check if this is the first payment (reference matches) or recurring
+          let subscription = await prisma.subscription.findFirst({
+            where: { paystackSubCode: reference, userId: user.id }
+          });
+          
+          if (!subscription) {
+            // Might be a recurring charge (new reference), find the active one
+            subscription = await prisma.subscription.findFirst({
+              where: { userId: user.id, status: "Active" }
+            });
+          }
+
+          if (subscription) {
+            // Activate the subscription if it was pending
+            if (subscription.status !== "Active") {
+              await prisma.subscription.update({
+                where: { id: subscription.id },
+                data: { status: "Active" }
+              });
+            }
+
+            // Create a brand new order for the delivery team to pack the nuts bundle!
+            const bundleOrder = await prisma.order.create({
+              data: {
+                userId: user.id,
+                status: "Confirmed",
+                confirmedAt: new Date(),
+                deliveryAddress: user.address || "Pending Address",
+                phoneNumber: verifiedPhone || user.savedPhone || "000",
+                paystackReference: reference,
+                items: {
+                  create: [
+                    {
+                      productId: null, // Custom bundle item
+                      productTitle: "Monthly Nuts Bundle",
+                      productPrice: data.amount / 100,
+                      quantity: 1,
+                    }
+                  ]
+                }
+              },
+              include: { items: true, user: true }
+            });
+
+            // Send Invoice Email for the recurring bundle payment
+            await sendInvoiceEmail(user.email, bundleOrder, bundleOrder.items);
           }
         }
       }
