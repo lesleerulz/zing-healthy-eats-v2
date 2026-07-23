@@ -46,7 +46,7 @@ export default function Footer() {
           <h3 className="text-xs uppercase tracking-[0.2em] font-semibold text-[#EBE5D9]/50">Connect</h3>
           <ul className="space-y-4">
             <li>
-              <a href="#" className="text-sm hover:text-[#D4A373] transition-colors">Instagram</a>
+              <a href="https://www.instagram.com/zinghealthytreatsgranola/" target="_blank" rel="noopener noreferrer" className="text-sm hover:text-[#D4A373] transition-colors">Instagram</a>
             </li>
             <li>
               <a href="#" className="text-sm hover:text-[#D4A373] transition-colors">Facebook</a>
