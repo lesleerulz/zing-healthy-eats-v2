@@ -227,7 +227,9 @@ export default function Home() {
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: index * 0.1 }}
               >
-                <ProductCard3D {...product} />
+                <Link href={`/product/${product.id}`} className="block">
+                  <ProductCard3D {...product} />
+                </Link>
               </motion.div>
             ))}
           </div>
