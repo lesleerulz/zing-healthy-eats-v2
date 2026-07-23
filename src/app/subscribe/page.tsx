@@ -129,60 +129,25 @@ export default function SubscribePage() {
             </div>
           </div>
 
-          {/* Right Column - Subscription Form */}
-          <div className="lg:col-span-6">
-            <div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-[#EBE5D9]">
-              <h2 className="font-[family-name:var(--font-playfair)] text-3xl text-[#1C1816] mb-2">Subscribe Now</h2>
-              <p className="text-[#7A614A] mb-8">Set up your monthly recurring payment securely.</p>
-              
-              <div className="bg-[#FAF8F5] p-6 rounded-2xl border border-[#DCD4C4] mb-8 flex justify-between items-center">
-                <div>
-                  <h3 className="font-bold text-[#1C1816]">Monthly Nuts Bundle</h3>
-                  <p className="text-[#7A614A] text-sm">Billed every month</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-[family-name:var(--font-playfair)] text-2xl text-[#1C1816]">Ksh 3,500</p>
-                  <p className="text-[#7A614A] text-xs">/ month</p>
-                </div>
+          {/* Right Column - Subscription Form (Coming Soon) */}
+          <div className="lg:col-span-6 flex flex-col justify-center">
+            <div className="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-[#EBE5D9] text-center flex flex-col items-center">
+              <div className="w-20 h-20 bg-[#EBE5D9] rounded-full flex items-center justify-center mb-6">
+                <ShieldCheck className="w-10 h-10 text-[#7A614A]" />
               </div>
-
-              <form onSubmit={handleSubscribe} className="space-y-6">
-                <div>
-                  <label className="text-xs uppercase tracking-widest text-[#7A614A] font-semibold mb-2 block">Full Name</label>
-                  <input required type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816]" />
-                </div>
-                <div>
-                  <label className="text-xs uppercase tracking-widest text-[#7A614A] font-semibold mb-2 block">Email Address</label>
-                  <input required type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816]" />
-                </div>
-                <div>
-                  <label className="text-xs uppercase tracking-widest text-[#7A614A] font-semibold mb-2 block">Phone Number</label>
-                  <input required type="tel" name="phone" value={formData.phone} placeholder="0712345678" onChange={handleInputChange} className="w-full px-4 py-3 bg-transparent border border-[#DCD4C4] rounded-lg focus:outline-none focus:border-[#1C1816] text-[#1C1816]" />
-                </div>
-
-                <div className="flex items-start gap-3 p-4 bg-[#EBE5D9] border border-[#DCD4C4] rounded-xl mt-4">
-                  <ShieldCheck className="w-5 h-5 text-[#7A614A] mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-sm font-semibold text-[#1C1816]">Secure Subscription Setup</p>
-                    <p className="text-xs text-[#7A614A] mt-1">You will be redirected to Paystack to authenticate your card or M-Pesa. You will be billed automatically every month.</p>
-                  </div>
-                </div>
-
-                <button 
-                  disabled={isProcessing}
-                  type="submit" 
-                  className="w-full flex items-center justify-center gap-2 py-4 bg-[#1C1816] text-[#FAF8F5] rounded-full font-semibold tracking-wide transition-all hover:bg-[#3A322C] disabled:opacity-70 mt-4"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Setting up Subscription...
-                    </>
-                  ) : (
-                    "Subscribe for Ksh 3,500 / month"
-                  )}
-                </button>
-              </form>
+              <h2 className="font-[family-name:var(--font-playfair)] text-4xl text-[#1C1816] mb-4">Coming Soon</h2>
+              <p className="text-[#7A614A] text-lg leading-relaxed max-w-md">
+                We're putting the finishing touches on our exclusive Zing Nuts Club subscription service. 
+                <br/><br/>
+                Stay tuned! You'll soon be able to get your favorite roasted nuts delivered automatically to your door.
+              </p>
+              
+              <button 
+                disabled
+                className="w-full max-w-sm mt-8 py-4 bg-[#EBE5D9] text-[#7A614A] rounded-full font-semibold tracking-wide cursor-not-allowed"
+              >
+                Subscriptions Opening Soon
+              </button>
             </div>
           </div>
 
