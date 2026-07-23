@@ -26,6 +26,7 @@ export const metadata: Metadata = {
 import ConditionalNavbar from "@/components/ConditionalNavbar";
 import { CartProvider } from "@/components/CartProvider";
 import CartDrawer from "@/components/CartDrawer";
+import Footer from "@/components/Footer";
 
 export default function RootLayout({
   children,
@@ -41,7 +42,12 @@ export default function RootLayout({
         <CartProvider>
           <ConditionalNavbar />
           <CartDrawer />
-          <SmoothScroll>{children}</SmoothScroll>
+          <SmoothScroll>
+            <div className="flex flex-col min-h-screen">
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </div>
+          </SmoothScroll>
         </CartProvider>
       </body>
     </html>
