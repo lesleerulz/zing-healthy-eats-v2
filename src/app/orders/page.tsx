@@ -183,7 +183,7 @@ function OrdersConfirmPage() {
                       {item.productTitle} <span className="text-[#9A8A7A]">× {item.quantity}</span>
                     </span>
                     <span className="text-[#7A614A] font-semibold">
-                      KES {(item.productPrice * item.quantity).toLocaleString()}
+                      Ksh {(item.productPrice * item.quantity).toLocaleString()}
                     </span>
                   </div>
                 ))}
@@ -294,13 +294,13 @@ function OrdersConfirmPage() {
                           {it.productTitle} <span className="text-[#9A8A7A]">× {it.quantity}</span>
                         </span>
                         <span className="font-medium">
-                          KES {(it.productPrice * it.quantity).toLocaleString()}
+                          Ksh {(it.productPrice * it.quantity).toLocaleString()}
                         </span>
                       </div>
                     ))}
                     <div className="flex justify-between border-t border-[#EBE5D9] mt-2 pt-2 text-sm font-bold text-[#1C1816]">
                       <span>Total</span>
-                      <span>KES {total.toLocaleString()}</span>
+                      <span>Ksh {total.toLocaleString()}</span>
                     </div>
                   </div>
                 );

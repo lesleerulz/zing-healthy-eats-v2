@@ -10,7 +10,7 @@ const FEATURED_PRODUCTS = [
     id: 1,
     title: "Signature Honey Almond",
     description: "Oats baked with pure wild honey, roasted almonds, and a hint of vanilla.",
-    price: "$12.50",
+    price: "Ksh 850",
     category: "Granola",
     imageUrl: "/product1.jpg"
   },
@@ -18,7 +18,7 @@ const FEATURED_PRODUCTS = [
     id: 2,
     title: "Tropical Sunrise",
     description: "A vibrant blend of dried mango, toasted coconut, macadamia nuts, and cashews.",
-    price: "$14.00",
+    price: "Ksh 1,100",
     category: "Trail Mix",
     imageUrl: "/product2.jpg"
   },
@@ -26,7 +26,7 @@ const FEATURED_PRODUCTS = [
     id: 3,
     title: "Dark Choc Hazelnut",
     description: "Roasted hazelnuts bound together with rich 70% dark chocolate and sea salt.",
-    price: "$16.00",
+    price: "Ksh 1,350",
     category: "Premium",
     imageUrl: "/product3.jpg"
   }

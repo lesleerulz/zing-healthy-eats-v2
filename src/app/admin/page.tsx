@@ -20,7 +20,7 @@ export default async function AdminDashboard() {
   const totalRevenue = (itemsRevenue[0]?.total ?? 0) + (deliveryRevenue[0]?.total ?? 0);
 
   const stats = [
-    { name: "Total Revenue", value: `KES ${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-[#D4A373]" },
+    { name: "Total Revenue", value: `Ksh ${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-[#D4A373]" },
     { name: "Total Orders", value: totalOrders.toString(), icon: ShoppingBag, color: "text-[#F5F5F5]" },
     { name: "Pending Orders", value: pendingOrders.toString(), icon: Clock, color: "text-[#F5F5F5]" },
     { name: "Low Stock Items", value: lowStockItems.toString(), icon: AlertTriangle, color: "text-red-400" },
@@ -76,7 +76,7 @@ export default async function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#9CA3AF]">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#F5F5F5]">${total.toFixed(2)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#F5F5F5]">Ksh {total.toLocaleString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         order.status === "Pending" ? "bg-yellow-500/10 text-yellow-500" :

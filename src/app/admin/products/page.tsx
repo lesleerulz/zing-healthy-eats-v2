@@ -58,7 +58,7 @@ export default async function AdminProductsPage() {
                     {product.category?.name || "Uncategorized"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-[#F5F5F5]">
-                    ${product.price.toFixed(2)}
+                    Ksh {product.price.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-[#9CA3AF]">
                     {product.quantity}

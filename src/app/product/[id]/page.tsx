@@ -67,7 +67,7 @@ export default function ProductDetailsPage() {
     addToCart({
       id: product.id,
       title: product.title,
-      price: `KES ${product.price.toLocaleString()}`,
+      price: `Ksh ${product.price.toLocaleString()}`,
       imageUrl: product.image,
       quantity: quantity,
     });
@@ -105,7 +105,7 @@ export default function ProductDetailsPage() {
     description: product.description || MOCK_META.description,
     category: product.category,
     imageUrl: product.image,
-    priceLabel: `KES ${product.price.toLocaleString()}`,
+    priceLabel: `Ksh ${product.price.toLocaleString()}`,
   };
 
   return (
@@ -211,7 +211,7 @@ export default function ProductDetailsPage() {
                   ) : (
                     <>
                       <ShoppingBag className="w-5 h-5" />
-                      Add to order — KES {(product.price * quantity).toLocaleString()}
+                      Add to order — Ksh {(product.price * quantity).toLocaleString()}
                     </>
                   )}
                 </button>

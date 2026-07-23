@@ -99,7 +99,7 @@ export default function CartDrawer() {
                           </div>
                           
                           <p className="font-semibold text-[#1C1816] text-sm">
-                            KES {(parseFloat(item.price.replace(/KES |,|_/g, '')) * item.quantity).toLocaleString()}
+                            Ksh {(parseFloat(item.price.replace(/Ksh |KES |,/g, '')) * item.quantity).toLocaleString()}
                           </p>
                         </div>
                       </div>
@@ -118,7 +118,7 @@ export default function CartDrawer() {
                     <p className="text-xs text-[#9A8A7A]">Shipping & taxes calculated at checkout</p>
                   </div>
                   <p className="font-[family-name:var(--font-playfair)] text-3xl text-[#1C1816]">
-                    KES {cartTotal.toLocaleString()}
+                    Ksh {cartTotal.toLocaleString()}
                   </p>
                 </div>
                 

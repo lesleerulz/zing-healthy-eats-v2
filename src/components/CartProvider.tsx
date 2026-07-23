@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("zing-cart", JSON.stringify(cart));
     
     const total = cart.reduce((sum, item) => {
-      const priceNumeric = parseFloat(item.price.replace(/KES |,|_/g, ''));
+      const priceNumeric = parseFloat(item.price.replace(/Ksh |KES |,/g, ''));
       return sum + (priceNumeric * item.quantity);
     }, 0);
     

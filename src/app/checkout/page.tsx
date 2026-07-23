@@ -47,7 +47,7 @@ export default function CheckoutPage() {
     const orderItems = cart.map(item => ({
       id: item.id,
       title: item.title,
-      price: parseFloat(item.price.replace(/KES |,|_/g, '')),
+      price: parseFloat(item.price.replace(/Ksh |KES |,/g, '')),
       quantity: item.quantity,
     }));
 
@@ -143,7 +143,7 @@ export default function CheckoutPage() {
                 ) : (
                   <>
                     <Lock className="w-5 h-5" />
-                    Continue to Payment — KES {cartTotal.toLocaleString()}
+                    Continue to Payment — Ksh {cartTotal.toLocaleString()}
                   </>
                 )}
               </button>
@@ -165,7 +165,7 @@ export default function CheckoutPage() {
                     <div className="flex-1 pt-1">
                       <h3 className="font-medium text-[#1C1816] text-sm leading-tight mb-1">{item.title}</h3>
                       <p className="text-[#7A614A] text-sm font-semibold">
-                         KES {(parseFloat(item.price.replace(/KES |,|_/g, '')) * item.quantity).toLocaleString()}
+                        Ksh {(parseFloat(item.price.replace(/Ksh |KES |,/g, '')) * item.quantity).toLocaleString()}
                       </p>
                     </div>
                   </div>
@@ -175,7 +175,7 @@ export default function CheckoutPage() {
               <div className="border-t border-[#DCD4C4] pt-6 space-y-3 text-sm">
                 <div className="flex justify-between text-[#7A614A]">
                   <span>Subtotal</span>
-                  <span>KES {cartTotal.toLocaleString()}</span>
+                  <span>Ksh {cartTotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-[#7A614A]">
                   <span>Delivery</span>
@@ -183,7 +183,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between font-bold text-[#1C1816] text-xl pt-4 border-t border-[#DCD4C4] mt-4">
                   <span>Total</span>
-                  <span>KES {cartTotal.toLocaleString()}</span>
+                  <span>Ksh {cartTotal.toLocaleString()}</span>
                 </div>
               </div>
               

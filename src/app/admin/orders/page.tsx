@@ -50,7 +50,7 @@ export default async function AdminOrdersPage() {
                       {itemsCount}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#F5F5F5]">
-                      ${total.toFixed(2)}
+                      Ksh {total.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
