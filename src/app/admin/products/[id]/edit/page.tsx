@@ -78,7 +78,7 @@ export default async function EditProductPage({ params }: { params: { id: string
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[#9CA3AF]">Price ($)</label>
+                <label className="text-sm font-medium text-[#9CA3AF]">Price (Ksh)</label>
                 <input 
                   type="number" 
                   name="price"
