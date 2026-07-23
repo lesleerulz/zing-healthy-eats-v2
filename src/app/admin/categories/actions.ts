@@ -5,10 +5,9 @@ import { revalidatePath } from "next/cache";
 
 export async function createCategory(formData: FormData) {
   const name = formData.get("name") as string;
-  const description = formData.get("description") as string;
 
   await prisma.category.create({
-    data: { name, description },
+    data: { name },
   });
 
   revalidatePath("/admin/categories");
@@ -17,11 +16,10 @@ export async function createCategory(formData: FormData) {
 
 export async function updateCategory(id: number, formData: FormData) {
   const name = formData.get("name") as string;
-  const description = formData.get("description") as string;
 
   await prisma.category.update({
     where: { id },
-    data: { name, description },
+    data: { name },
   });
 
   revalidatePath("/admin/categories");
