@@ -80,7 +80,7 @@ export default function OrderDetailsClient({ order, subtotal, total }: { order: 
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {order.items.map(item => (
+                {order.items.map((item: any) => (
                   <tr key={item.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4">
                       <div className="font-medium text-white">{item.productTitle}</div>
