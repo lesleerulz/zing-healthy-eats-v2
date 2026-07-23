@@ -141,7 +141,7 @@ export default function SubscribePage() {
                   <p className="text-[#7A614A] text-sm">Billed every month</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-[family-name:var(--font-playfair)] text-2xl text-[#1C1816]">KES 3,500</p>
+                  <p className="font-[family-name:var(--font-playfair)] text-2xl text-[#1C1816]">Ksh 3,500</p>
                   <p className="text-[#7A614A] text-xs">/ month</p>
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default function SubscribePage() {
                       Setting up Subscription...
                     </>
                   ) : (
-                    "Subscribe for KES 3,500 / month"
+                    "Subscribe for Ksh 3,500 / month"
                   )}
                 </button>
               </form>

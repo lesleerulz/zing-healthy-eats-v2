@@ -101,7 +101,7 @@ export default function CatalogPage() {
                     title={product.title}
                     description={product.description}
                     category={product.category}
-                    price={`KES ${product.price.toLocaleString()}`}
+                    price={`Ksh ${product.price.toLocaleString()}`}
                     imageUrl={product.image}
                   />
                 </a>

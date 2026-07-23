@@ -39,18 +39,18 @@ export async function sendInvoiceEmail(userEmail: string, order: any, items: any
             <tr style="border-bottom: 1px solid #eee;">
               <td style="padding: 8px 0;">${item.productTitle}</td>
               <td style="padding: 8px 0;">${item.quantity}</td>
-              <td style="padding: 8px 0; text-align: right;">KES ${item.productPrice}</td>
+              <td style="padding: 8px 0; text-align: right;">Ksh ${item.productPrice}</td>
             </tr>
           `).join("")}
         </tbody>
         <tfoot>
           <tr>
             <td colspan="2" style="padding: 8px 0; font-weight: bold;">Delivery Fee</td>
-            <td style="padding: 8px 0; text-align: right; font-weight: bold;">KES ${order.deliveryFee || 0}</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: bold;">Ksh ${order.deliveryFee || 0}</td>
           </tr>
           <tr>
             <td colspan="2" style="padding: 8px 0; font-weight: bold; font-size: 1.1em;">Total Paid</td>
-            <td style="padding: 8px 0; text-align: right; font-weight: bold; font-size: 1.1em; color: #D4A373;">KES ${totalWithFee}</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: bold; font-size: 1.1em; color: #D4A373;">Ksh ${totalWithFee}</td>
           </tr>
         </tfoot>
       </table>
