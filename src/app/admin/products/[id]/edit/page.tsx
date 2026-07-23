@@ -4,6 +4,7 @@ import { ArrowLeft, Save, Edit as EditIcon } from "lucide-react";
 import PageWrapper from "../../../PageWrapper";
 import { updateProduct } from "../../actions";
 import { notFound } from "next/navigation";
+import ImageUploader from "@/components/ImageUploader";
 
 export default async function EditProductPage({ params }: { params: { id: string } }) {
   const id = parseInt(params.id, 10);
@@ -101,14 +102,8 @@ export default async function EditProductPage({ params }: { params: { id: string
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[#9CA3AF]">Image URL</label>
-              <input 
-                type="text" 
-                name="image"
-                defaultValue={product.image}
-                className="w-full bg-[#0F0F12] border border-[#2A2A35] rounded-lg px-4 py-2 text-[#F5F5F5] focus:outline-none focus:border-[#D4A373] transition-colors"
-                required
-              />
+              <label className="text-sm font-medium text-[#9CA3AF]">Upload Image</label>
+              <ImageUploader defaultValue={product.image} />
             </div>
 
             <div className="flex items-center gap-3 pt-4 border-t border-[#2A2A35]">

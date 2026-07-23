@@ -3,6 +3,7 @@ import { PackagePlus, Save, ArrowLeft, Image as ImageIcon } from "lucide-react";
 import Link from "next/link";
 
 import { createProduct } from "../actions";
+import ImageUploader from "@/components/ImageUploader";
 
 export default async function NewProductPage() {
   const categories = await prisma.category.findMany({
@@ -116,18 +117,12 @@ export default async function NewProductPage() {
               </div>
             </div>
 
-            {/* Image Upload Placeholder */}
+            {/* Image Upload */}
             <div className="space-y-4 pt-4 border-t border-white/5">
               <h2 className="text-lg font-semibold text-white">Product Image</h2>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Image URL</label>
-                <input 
-                  type="text" 
-                  name="image"
-                  placeholder="https://example.com/image.jpg or /images/product.jpg"
-                  className="w-full bg-[#0F0F12] border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4A373] transition-colors"
-                  required
-                />
+                <label className="text-sm font-medium text-gray-300">Upload Image</label>
+                <ImageUploader />
               </div>
             </div>
           </div>
