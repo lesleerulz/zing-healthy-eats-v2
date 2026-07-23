@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopBar from "./AdminTopBar";
+import AdminAnimatePresence from "./AdminAnimatePresence";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -12,12 +13,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect("/profile");
   }
 
+  const jwtSecret = process.env.JWT_SECRET || process.env.SECRET_KEY;
+  if (!jwtSecret) {
+    redirect("/profile");
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.SECRET_KEY || "fallback-secret-for-dev") as { isAdmin?: boolean, userId?: number };
+    const decoded = jwt.verify(token, jwtSecret) as { isAdmin?: boolean; userId?: number };
     if (!decoded.isAdmin) {
       redirect("/profile");
     }
   } catch (error) {
+    console.error("[AdminLayout] JWT verification failed:", error);
     redirect("/profile");
   }
 
@@ -27,7 +34,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="flex flex-col flex-1 overflow-hidden">
         <AdminTopBar />
         <main className="flex-1 overflow-y-auto p-6">
-          {children}
+          <AdminAnimatePresence>
+            {children}
+          </AdminAnimatePresence>
         </main>
       </div>
     </div>

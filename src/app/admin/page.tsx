@@ -4,7 +4,7 @@ import Link from "next/link";
 import PageWrapper from "./PageWrapper";
 
 export default async function AdminDashboard() {
-  const [totalOrders, pendingOrders, lowStockItems, recentOrders, allOrders] = await Promise.all([
+  const [totalOrders, pendingOrders, lowStockItems, recentOrders, itemsRevenue, deliveryRevenue] = await Promise.all([
     prisma.order.count(),
     prisma.order.count({ where: { status: "Pending" } }),
     prisma.product.count({ where: { quantity: { lt: 5 } } }),
@@ -13,16 +13,14 @@ export default async function AdminDashboard() {
       orderBy: { createdAt: "desc" },
       include: { user: true, items: true },
     }),
-    prisma.order.findMany({ include: { items: true } })
+    prisma.$queryRaw<[{ total: number }]>`SELECT COALESCE(SUM(quantity * product_price), 0) AS total FROM order_item`,
+    prisma.$queryRaw<[{ total: number }]>`SELECT COALESCE(SUM(delivery_fee), 0) AS total FROM "order"`,
   ]);
 
-  const totalRevenue = allOrders.reduce((sum, order) => {
-    const itemsTotal = order.items.reduce((itemSum, item) => itemSum + (item.quantity * item.productPrice), 0);
-    return sum + itemsTotal + order.deliveryFee;
-  }, 0);
+  const totalRevenue = Number(itemsRevenue[0].total) + Number(deliveryRevenue[0].total);
 
   const stats = [
-    { name: "Total Revenue", value: `$${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-[#D4A373]" },
+    { name: "Total Revenue", value: `KES ${totalRevenue.toFixed(2)}`, icon: DollarSign, color: "text-[#D4A373]" },
     { name: "Total Orders", value: totalOrders.toString(), icon: ShoppingBag, color: "text-[#F5F5F5]" },
     { name: "Pending Orders", value: pendingOrders.toString(), icon: Clock, color: "text-[#F5F5F5]" },
     { name: "Low Stock Items", value: lowStockItems.toString(), icon: AlertTriangle, color: "text-red-400" },
@@ -74,7 +72,7 @@ export default async function AdminDashboard() {
                 return (
                   <tr key={order.id} className="hover:bg-[#2A2A35]/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#F5F5F5]">#{order.id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#9CA3AF]">{order.user.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#9CA3AF]">{order.user?.email ?? "Deleted User"}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#9CA3AF]">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>

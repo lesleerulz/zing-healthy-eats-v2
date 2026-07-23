@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Users, Search, ChevronRight, ShieldCheck, UserCheck } from "lucide-react";
+import CustomerAvatar from "./CustomerAvatar";
 
 export default async function CustomersPage() {
   const users = await prisma.user.findMany({
@@ -57,17 +58,7 @@ export default async function CustomersPage() {
                 <tr key={user.id} className="hover:bg-white/5 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden shrink-0">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img 
-                          src={user.profilePicture.startsWith('http') ? user.profilePicture : `/images/${user.profilePicture}`} 
-                          alt={user.username}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/images/default_profile.webp';
-                          }}
-                        />
-                      </div>
+                      <CustomerAvatar src={user.profilePicture} username={user.username} />
                       <div>
                         <div className="font-medium text-white">{user.username}</div>
                         <div className="text-sm text-gray-500">{user.email}</div>
