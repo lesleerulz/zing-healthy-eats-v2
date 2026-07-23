@@ -44,7 +44,7 @@ export default async function AdminProductsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#0F0F12] relative">
                       <Image 
-                        src={product.image.startsWith('http') ? product.image : `/${product.image}`}
+                        src={product.image.startsWith('http') || product.image.startsWith('/') ? product.image : `/${product.image}`}
                         alt={product.title}
                         fill
                         className="object-cover"
