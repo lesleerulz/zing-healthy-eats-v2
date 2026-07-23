@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FolderTree, Plus, Edit, Trash2, X, Save } from "lucide-react";
+import { FolderTree, Plus, Edit, Trash2, X, Save, Search } from "lucide-react";
 import { createCategory, updateCategory, deleteCategory } from "./actions";
 
 type Category = {
@@ -13,6 +13,11 @@ type Category = {
 export default function CategoryManager({ categories }: { categories: Category[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCategories = categories.filter((cat) => 
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const openCreateModal = () => {
     setEditingCategory(null);
@@ -26,7 +31,7 @@ export default function CategoryManager({ categories }: { categories: Category[]
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#F5F5F5] flex items-center gap-2">
             <FolderTree className="h-6 w-6 text-[#D4A373]" />
@@ -34,13 +39,25 @@ export default function CategoryManager({ categories }: { categories: Category[]
           </h1>
           <p className="text-[#9CA3AF] text-sm mt-1">Manage your product categories.</p>
         </div>
-        <button 
-          onClick={openCreateModal}
-          className="bg-[#D4A373] text-[#0F0F12] hover:bg-[#D4A373]/90 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          Create Category
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <input 
+              type="text"
+              placeholder="Search categories..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full sm:w-64 bg-[#1A1A23] border border-white/10 rounded-lg pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#D4A373] transition-colors"
+            />
+          </div>
+          <button 
+            onClick={openCreateModal}
+            className="bg-[#D4A373] text-[#0F0F12] hover:bg-[#D4A373]/90 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors whitespace-nowrap"
+          >
+            <Plus className="h-4 w-4" />
+            Create Category
+          </button>
+        </div>
       </div>
 
       <div className="bg-[#1A1A23] rounded-xl border border-[#2A2A35] overflow-hidden">
@@ -53,14 +70,14 @@ export default function CategoryManager({ categories }: { categories: Category[]
             </tr>
           </thead>
           <tbody className="divide-y divide-[#2A2A35]">
-            {categories.length === 0 ? (
+            {filteredCategories.length === 0 ? (
               <tr>
                 <td colSpan={3} className="px-6 py-8 text-center text-[#9CA3AF]">
-                  No categories found. Create one to get started.
+                  No categories found matching "{searchQuery}".
                 </td>
               </tr>
             ) : (
-              categories.map((cat) => (
+              filteredCategories.map((cat) => (
                 <tr key={cat.id} className="hover:bg-[#2A2A35]/50 transition-colors">
                   <td className="px-6 py-4 font-medium text-[#F5F5F5]">{cat.name}</td>
                   <td className="px-6 py-4">
