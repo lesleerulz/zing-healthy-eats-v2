@@ -6,8 +6,9 @@ import { updateProduct } from "../../actions";
 import { notFound } from "next/navigation";
 import ImageUploader from "@/components/ImageUploader";
 
-export default async function EditProductPage({ params }: { params: { id: string } }) {
-  const id = parseInt(params.id, 10);
+export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: paramId } = await params;
+  const id = parseInt(paramId, 10);
   if (isNaN(id)) notFound();
 
   const [product, categories] = await Promise.all([
