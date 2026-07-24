@@ -52,6 +52,7 @@ export async function updateProduct(id: number, formData: FormData) {
     },
   });
 
+  revalidatePath("/");
   revalidatePath("/admin/products");
   revalidatePath("/catalog");
   redirect("/admin/products");
