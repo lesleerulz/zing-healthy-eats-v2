@@ -65,10 +65,7 @@ export default function Navbar() {
           Subscriptions
           <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#1C1816] transition-all duration-300 group-hover:w-full"></span>
         </a>
-        <a href="#" className="hover:text-[#1C1816] transition-colors relative group">
-          Our Story
-          <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#1C1816] transition-all duration-300 group-hover:w-full"></span>
-        </a>
+
       </div>
 
       <div className="flex items-center gap-4 text-[#1C1816] z-50">
@@ -110,9 +107,7 @@ export default function Navbar() {
             <a href="/subscribe" onClick={() => setIsMobileMenuOpen(false)} className="text-[#1C1816] font-semibold text-lg uppercase tracking-widest text-center">
               Subscriptions
             </a>
-            <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="text-[#1C1816] font-semibold text-lg uppercase tracking-widest text-center">
-              Our Story
-            </a>
+
           </motion.div>
         )}
       </AnimatePresence>
